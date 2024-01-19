@@ -1,5 +1,6 @@
 package com.tomavelev.payment.config;
 
+import com.tomavelev.payment.model.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -26,8 +27,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(registry ->
                 registry
                         .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/user/**").hasAuthority("MERCHANT")
-                        .requestMatchers("/admin/**").hasAuthority("ADMIN").anyRequest().authenticated());
+                        .requestMatchers("/user/**").hasAuthority(User.ROLE_MERCHANT)
+                        .requestMatchers("/admin/**").hasAuthority(User.ROLE_ADMIN).anyRequest().authenticated());
         http.sessionManagement(httpSecuritySessionManagementConfigurer
                 -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

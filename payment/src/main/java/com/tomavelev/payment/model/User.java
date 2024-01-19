@@ -1,9 +1,6 @@
 package com.tomavelev.payment.model;
 
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -16,7 +13,10 @@ import lombok.Setter;
 @EqualsAndHashCode(callSuper = true)
 @Entity(name = "users")
 public class User extends BaseEntity {
+    public static final String ROLE_MERCHANT = "MERCHANT";
+    public static final String ROLE_ADMIN = "ADMIN";
     @Email
+    @Column(unique = true)
     private String email;
 
     private String password;

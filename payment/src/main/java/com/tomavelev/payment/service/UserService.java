@@ -33,6 +33,9 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
     public RestResponse<User> getUsers(long offset, int limit) {
         if (limit <= 0) {
             limit = 10;
@@ -59,9 +62,6 @@ public class UserService {
             }
         }
     }
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     public void generateSCV(String filePath) throws IOException, CsvRequiredFieldEmptyException, CsvDataTypeMismatchException {
 

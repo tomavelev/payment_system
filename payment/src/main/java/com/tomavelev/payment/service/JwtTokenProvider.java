@@ -17,14 +17,14 @@ import java.util.List;
 
 @Service
 public class JwtTokenProvider {
-
+    public static final String ROLES = "roles";
     private static final SecretKey SECRET_KEY = Keys.secretKeyFor(SignatureAlgorithm.HS256); // Replace with a secure key
     private static final long EXPIRATION_TIME = 864_000_000; // 10 days
     //This is for demo purposes. Should be 10 minutes for access token - with refresh token - some bigger time
 
     public String generateToken(String username, List<String> roles) {
         Claims claims = Jwts.claims().setSubject(username);
-        claims.put("roles", roles);
+        claims.put(ROLES, roles);
 
         Date now = new Date();
         Date expirationDate = new Date(now.getTime() + EXPIRATION_TIME);
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
         Claims claims = (Claims) Jwts.parserBuilder().setSigningKey(SECRET_KEY).build().parse(token).getBody();
         @SuppressWarnings("unchecked")
         Class<List<String>> stringListClass = (Class<List<String>>) (Class<?>) List.class;
-        List<String> roles = claims.get("roles", stringListClass);
+        List<String> roles = claims.get(ROLES, stringListClass);
         return User.builder().username(claims.getSubject()).authorities(roles.toArray(new String[]{})).password("").build();
     }
 

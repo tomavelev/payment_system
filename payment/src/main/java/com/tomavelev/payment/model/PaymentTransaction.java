@@ -1,9 +1,12 @@
 package com.tomavelev.payment.model;
 
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,7 +14,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity(name = "transaction")
 @Getter
@@ -21,6 +23,7 @@ import java.util.List;
 public class PaymentTransaction extends BaseEntity {
 
     @Email
+    @NotBlank
     @Column(name = "customer_email")
     private String customerEmail;
 
@@ -34,16 +37,18 @@ public class PaymentTransaction extends BaseEntity {
     @Min(value = 0)
     private BigDecimal amount;
 
-
     private TransactionStatus status;
 
-    @OneToMany(mappedBy = "paymentTransaction", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PaymentTransaction> paymentTransactions;
+    @Column(name = "reference_id")
+    private String referenceId;
+//    @OneToMany(mappedBy = "paymentTransaction", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<PaymentTransaction> paymentTransactions;
+//    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+//    @Nullable
+//    @JoinColumn(name = "reference_id", nullable = true)
+//    private PaymentTransaction paymentTransaction;
 
 
-    @ManyToOne(optional = false, fetch = FetchType.LAZY)
-    @JoinColumn(name = "reference_id")
-    private PaymentTransaction paymentTransaction;
 
     @ManyToOne
     private Merchant merchant;
