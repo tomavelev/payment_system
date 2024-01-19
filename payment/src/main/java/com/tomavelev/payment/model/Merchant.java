@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
+import jakarta.validation.constraints.NotBlank;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -21,13 +22,15 @@ import java.util.List;
 @Entity(name = "merchant")
 public class Merchant extends BaseEntity {
 
+    @NotBlank
     private String name;
 
     @JdbcTypeCode(SqlTypes.LONGVARCHAR)
     @Column(name = "description")
     private String description;
 
-    private boolean status;
+    @Column(name = "status")
+    private boolean active;
 
     @Column(name = "total_transaction_sum", scale = 5, precision = 20)
     private BigDecimal totalTransactionSum;
