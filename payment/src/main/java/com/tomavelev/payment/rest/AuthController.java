@@ -1,6 +1,6 @@
 package com.tomavelev.payment.rest;
 
-import com.tomavelev.payment.model.LoginResponse;
+import com.tomavelev.payment.model.response.LoginResponse;
 import com.tomavelev.payment.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;

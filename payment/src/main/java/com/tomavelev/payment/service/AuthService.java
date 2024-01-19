@@ -1,7 +1,7 @@
 package com.tomavelev.payment.service;
 
-import com.tomavelev.payment.model.BusinessCode;
-import com.tomavelev.payment.model.LoginResponse;
+import com.tomavelev.payment.model.response.BusinessCode;
+import com.tomavelev.payment.model.response.LoginResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
