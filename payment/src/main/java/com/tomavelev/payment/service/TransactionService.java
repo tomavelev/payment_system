@@ -12,6 +12,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
+
 
 @Service
 public class TransactionService {
@@ -38,5 +40,10 @@ public class TransactionService {
         }
 
         return new PaymentResponse(BusinessCode.SUCCESS);
+    }
+
+    @Transactional
+    public void cleanTransactionsOlderThan(Date date) {
+        transactionRepository.deleteAllByCreatedAtLessThan(date);
     }
 }
