@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ import java.io.*;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Random;
 
 @Service
@@ -40,7 +42,7 @@ public class UserService {
         if (limit <= 0) {
             limit = 10;
         }
-        Page<User> page = userRepository.findAll(PageRequest.ofSize(limit).withPage((int) (offset / limit)));
+        Page<User> page = userRepository.findAll(PageRequest.ofSize(limit).withPage((int) (offset / limit)).withSort(Sort.by(Sort.Direction.DESC, "createdAt")));
         return new RestResponse<>(page.get().toList(), page.getTotalElements(), null, BusinessCode.SUCCESS);
     }
 
@@ -95,6 +97,33 @@ public class UserService {
 
                 build.write(user);
             }
+        }
+    }
+
+    @Transactional
+    public void delete(User user) {
+        Optional<User> user1 = userRepository.findById(user.getId());
+        user1.ifPresent(value -> userRepository.delete(value));
+    }
+
+    @Transactional
+    public void update(User user) {
+        Optional<User> user1 = userRepository.findById(user.getId());
+        if (user1.isPresent()) {
+            User dbUser = user1.get();
+            if (!dbUser.getPassword().equals(user.getPassword())) {
+                user.setPassword(passwordEncoder.encode(user.getPassword()));
+            }
+            dbUser.setEmail(user.getEmail());
+
+            if (dbUser.getMerchant() != null) {
+                dbUser.getMerchant().setActive(user.getMerchant().isActive());
+                dbUser.getMerchant().setName(user.getMerchant().getName());
+                dbUser.getMerchant().setDescription(user.getMerchant().getDescription());
+                dbUser.getMerchant().setTotalTransactionSum(user.getMerchant().getTotalTransactionSum());
+            }
+            userRepository.save(dbUser);
+
         }
     }
 }

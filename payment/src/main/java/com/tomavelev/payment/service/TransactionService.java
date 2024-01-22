@@ -3,10 +3,13 @@ package com.tomavelev.payment.service;
 import com.tomavelev.payment.model.PaymentTransaction;
 import com.tomavelev.payment.model.response.BusinessCode;
 import com.tomavelev.payment.model.response.PaymentResponse;
+import com.tomavelev.payment.model.response.RestResponse;
 import com.tomavelev.payment.repository.TransactionRepository;
 import com.tomavelev.payment.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -45,5 +48,14 @@ public class TransactionService {
     @Transactional
     public void cleanTransactionsOlderThan(Date date) {
         transactionRepository.deleteAllByCreatedAtLessThan(date);
+    }
+
+    public RestResponse<PaymentTransaction> getTransactions(long offset, int limit) {
+        if (limit <= 0) {
+            limit = 10;
+        }
+        Page<PaymentTransaction> page = transactionRepository.findAll(PageRequest.ofSize(limit).withPage((int) (offset / limit)));
+        return new RestResponse<>(page.get().toList(), page.getTotalElements(), null, BusinessCode.SUCCESS);
+
     }
 }

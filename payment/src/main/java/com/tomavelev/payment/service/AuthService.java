@@ -26,13 +26,13 @@ public class AuthService {
 
         User user = userRepository.findByEmail(email);
         if (user == null) {
-            return new LoginResponse(null, BusinessCode.PROFILE_NOT_FOUND);
+            return new LoginResponse(null, null, BusinessCode.PROFILE_NOT_FOUND);
         }
 
         boolean passwordMatch = passwordEncoder.matches(password, user.getPassword());
 
         if (!passwordMatch) {
-            return new LoginResponse(null, BusinessCode.WRONG_PASSWORD);
+            return new LoginResponse(null,null, BusinessCode.WRONG_PASSWORD);
         }
 
         String role;
@@ -42,7 +42,7 @@ public class AuthService {
             role = User.ROLE_ADMIN;
         }
         String token = tokenProvider.generateToken(email, new ArrayList<>(List.of(role)));
-        return new LoginResponse(token, BusinessCode.SUCCESS);
+        return new LoginResponse(token, role, BusinessCode.SUCCESS);
     }
 
 }

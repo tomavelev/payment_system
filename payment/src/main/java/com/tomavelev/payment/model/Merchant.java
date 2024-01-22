@@ -1,5 +1,6 @@
 package com.tomavelev.payment.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.OneToMany;
@@ -35,9 +36,11 @@ public class Merchant extends BaseEntity {
     @Column(name = "total_transaction_sum", scale = 5, precision = 20)
     private BigDecimal totalTransactionSum;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "merchant")
     private List<PaymentTransaction> transactions;
 
+    @JsonIgnore
     @OneToOne(mappedBy = "merchant")
     private User user;
 
