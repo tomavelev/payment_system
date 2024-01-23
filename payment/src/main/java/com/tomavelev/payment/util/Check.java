@@ -11,7 +11,7 @@ import java.util.Date;
 public class Check {
 
 
-    private static final long HOUR = 60  * 60 * 1000;
+    public static final long HOUR = 60  * 60 * 1000;
     @Autowired
     private TransactionService transactionService;
 
