@@ -7,7 +7,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 
 export const host = "http://localhost:8080";
-export const TRANSACTIONS_PAGE_SIZE = 10;
+export const TRANSACTIONS_PAGE_SIZE = 5;
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>

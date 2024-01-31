@@ -6,6 +6,7 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 
+import java.io.File;
 import java.io.IOException;
 
 @SpringBootApplication
@@ -17,7 +18,7 @@ public class PaymentApplication {
             UserService bean = applicationContext.getBean(UserService.class);
             if (args[0].equals("import")) {
                 try {
-                    bean.importFromSCV(args[1]);
+                    bean.importFromSCV(new File(args[1]));
                 } catch (CsvChainedException | CsvFieldAssignmentException| IOException e) {
                     //handle it according to requirements.
                     //if import is important - throw. Otherwise - silence it.

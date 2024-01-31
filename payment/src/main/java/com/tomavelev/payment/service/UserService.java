@@ -15,6 +15,8 @@ import com.tomavelev.payment.model.response.RestResponse;
 import com.tomavelev.payment.repository.UserRepository;
 import com.tomavelev.payment.util.UserCsvMappingStrategy;
 import jakarta.transaction.Transactional;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,13 +26,13 @@ import org.springframework.stereotype.Service;
 
 import java.io.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
 @Service
 public class UserService {
+
+    @Autowired
+    private Validator validator;
 
     @Autowired
     private UserRepository userRepository;
@@ -47,7 +49,7 @@ public class UserService {
     }
 
     @Transactional
-    public void importFromSCV(String file) throws IOException, CsvFieldAssignmentException, CsvChainedException {
+    public void importFromSCV(File file) throws IOException, CsvFieldAssignmentException, CsvChainedException {
 
         final List<User> users = new ArrayList<>();
         try (Reader reader = new FileReader(file)) {
@@ -107,23 +109,43 @@ public class UserService {
     }
 
     @Transactional
-    public void update(User user) {
-        Optional<User> user1 = userRepository.findById(user.getId());
-        if (user1.isPresent()) {
-            User dbUser = user1.get();
-            if (!dbUser.getPassword().equals(user.getPassword())) {
-                user.setPassword(passwordEncoder.encode(user.getPassword()));
-            }
-            dbUser.setEmail(user.getEmail());
+    public String update(User user) {
 
-            if (dbUser.getMerchant() != null) {
-                dbUser.getMerchant().setActive(user.getMerchant().isActive());
-                dbUser.getMerchant().setName(user.getMerchant().getName());
-                dbUser.getMerchant().setDescription(user.getMerchant().getDescription());
-                dbUser.getMerchant().setTotalTransactionSum(user.getMerchant().getTotalTransactionSum());
-            }
-            userRepository.save(dbUser);
-
+        Set<ConstraintViolation<User>> violations = validator.validate(user);
+        if (!violations.isEmpty()) {
+            StringBuilder sb = new StringBuilder();
+            violations.forEach(userConstraintViolation -> sb.append(userConstraintViolation.getPropertyPath()).append(" value: '").append(userConstraintViolation.getInvalidValue()).append("' ").append(userConstraintViolation.getMessage()));
+            return sb.toString();
         }
+
+        User userByEmail = userRepository.findByEmail(user.getEmail());
+        if (user.getId() == null) {
+            if (userByEmail != null) {
+                return BusinessCode.EMAIL_EXISTS.name();
+            }
+
+            user.setPassword(passwordEncoder.encode(user.getPassword()));
+            userRepository.save(user);
+        } else {
+
+            Optional<User> user1 = userRepository.findById(user.getId());
+            if (user1.isPresent()) {
+                User dbUser = user1.get();
+
+                if (!dbUser.getPassword().equals(user.getPassword())) {
+                    user.setPassword(passwordEncoder.encode(user.getPassword()));
+                }
+                dbUser.setEmail(user.getEmail());
+
+                if (dbUser.getMerchant() != null) {
+                    dbUser.getMerchant().setActive(user.getMerchant().isActive());
+                    dbUser.getMerchant().setName(user.getMerchant().getName());
+                    dbUser.getMerchant().setDescription(user.getMerchant().getDescription());
+                    dbUser.getMerchant().setTotalTransactionSum(user.getMerchant().getTotalTransactionSum());
+                }
+                userRepository.save(dbUser);
+            }
+        }
+        return BusinessCode.SUCCESS.name();
     }
 }

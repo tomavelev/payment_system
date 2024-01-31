@@ -5,5 +5,7 @@ public enum BusinessCode {
     PROFILE_NOT_FOUND,
     WRONG_PASSWORD,
     ERROR,
-    MERCHANT_NOT_ACTIVE
+    MERCHANT_NOT_ACTIVE,
+
+    EMAIL_EXISTS,
 }

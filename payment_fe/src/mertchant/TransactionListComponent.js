@@ -34,28 +34,24 @@ class TransactionListComponent extends Component {
   firstPage() {
     this.setState({
       offset: 0
-    })
-    this.load()
+    }, () => this.load())
   }
   previousPage() {
 
     this.setState({
       offset: this.state.offset - TRANSACTIONS_PAGE_SIZE
-    })
-    this.load()
+    }, () => this.load())
   }
   nextPage() {
     this.setState({
       offset: this.state.offset + TRANSACTIONS_PAGE_SIZE
-    })
-    this.load()
+    }, () => this.load())
+
   }
   lastPage() {
     this.setState({
       offset: this.state.count - TRANSACTIONS_PAGE_SIZE
-    })
-    this.load()
-
+    }, () => this.load())
   }
 
   load() {
@@ -78,20 +74,22 @@ class TransactionListComponent extends Component {
   }
   render() {
     return (
-      <div className="transaction"> {this.state.list.map(transaction =>
-        <Card key={transaction.id} className="transaction">
-          <CardBody>
-            <div>id: {transaction.id}</div>
-            <div>createdAt: {transaction.createdAt}</div>
-            <div>updatedAt: {transaction.updatedAt}</div>
-            <div>customerEmail: {transaction.customerEmail}</div>
-            <div>customerPhone: {transaction.customerPhone}</div>
-            <div>uuid: {transaction.uuid}</div>
-            <div>amount: {transaction.amount}</div>
-            <div>referenceId: {transaction.referenceId}</div>
-            <div>status: {transaction.status}</div>
-          </CardBody></Card>
-      )}
+      <div className="transactions">
+
+        {this.state.list.map(transaction =>
+          <Card key={transaction.id} className="transaction">
+            <CardBody>
+              <div>id: {transaction.id}</div>
+              <div>createdAt: {transaction.createdAt}</div>
+              <div>updatedAt: {transaction.updatedAt}</div>
+              <div>customerEmail: {transaction.customerEmail}</div>
+              <div>customerPhone: {transaction.customerPhone}</div>
+              <div>uuid: {transaction.uuid}</div>
+              <div>amount: {transaction.amount}</div>
+              <div>referenceId: {transaction.referenceId}</div>
+              <div>status: {transaction.status}</div>
+            </CardBody></Card>
+        )}
 
         {this.state.offset > 0 ? (
           <span>
@@ -121,7 +119,7 @@ class TransactionListComponent extends Component {
           ""
         )}
 
-        <div>{this.state.offset+1} to {this.state.offset+this.state.list.length} Total Transactions {this.state.count}</div>
+        <div>{this.state.offset + 1} to {this.state.offset + this.state.list.length} Total Transactions {this.state.count}</div>
       </div>
     )
   }

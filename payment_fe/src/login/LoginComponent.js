@@ -1,15 +1,19 @@
 import axios from 'axios';
 import { Component } from 'react';
-import { Button, Card, CardBody, Container, Form } from 'react-bootstrap';
+import { Button, Card, CardBody, Container, Form, ProgressBar } from 'react-bootstrap';
 import { host } from '..';
-import LoginService from '../service/LoginService';
 
 
 class LogInFormComponent extends Component {
 
   constructor(props) {
     super(props);
-    this.state = { email: '', password: '' };
+    this.state =
+    {
+      email: '',
+      password: '',
+      loading: false
+    };
 
     this.handleEmail = this.handleEmail.bind(this);
     this.handlePassword = this.handlePassword.bind(this);
@@ -34,12 +38,14 @@ class LogInFormComponent extends Component {
   handleSubmit(event) {
     event.preventDefault();
     var _this = this;
+    this.setState({ loading: true })
     axios.post(host + '/public/login',
       {
-        // email: this.state.email,
-        // password: this.state.password
+        email: this.state.email,
+        password: this.state.password
       }, { headers: { 'content-type': 'application/x-www-form-urlencoded' } })
       .then(function (response) {
+        _this.setState({ loading: false })
         if (response.data.code === "SUCCESS") {
           localStorage.setItem("token", response.data.token);
           switch (response.data.role) {
@@ -58,6 +64,7 @@ class LogInFormComponent extends Component {
       })
       .catch(function (error) {
         //TODO show error
+        _this.setState({ loading: false })
         console.log(error);
       });
 
@@ -83,7 +90,11 @@ class LogInFormComponent extends Component {
                 <Form.Control type="Password" placeholder="12345678" />
               </Form.Group>
 
-              <Button type='submit'>Login</Button>
+              {this.state.loading ? <div><ProgressBar animated={true} min={0} max={100} now={50} />&nbsp;</div> : ''}
+
+
+              <Button type='submit' disabled={this.state.loading}
+              >Login</Button>
             </Form>
           </CardBody>
         </Card>
