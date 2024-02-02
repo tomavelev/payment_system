@@ -34,8 +34,9 @@ The response is the JSON object:
 
 As both the number of Users and Transactions may go up endlessly (they are not nomenclature) - the get endpoints are paginated.
 - Get Uesrs
-curl --request GET {host}/admin/users -H "Authorization: Bearer: thetoken}" -d 'offset=0&limit=10'
+<code>curl --request GET {host}/admin/users -H "Authorization: Bearer: thetoken}" -d 'offset=0&limit=10'</code>
 The response is: 
+<pre>
 {
     list: {
         ....
@@ -44,11 +45,11 @@ The response is:
     message: '' , //may be null
     code: 'SUCCESS'
 }
-
+</pre>
 - Get Transactions
-curl --request GET {host}/transactions -H "Authorization: Bearer: thetoken}" -d 'offset=0&limit=10'
+<code>curl --request GET {host}/transactions -H "Authorization: Bearer: thetoken}" -d 'offset=0&limit=10'</code>
 The response is: 
-{
+<pre>{
     list: {
         {
             'id':'transaction-id', 
@@ -60,11 +61,17 @@ The response is:
     count: 10, //total cout,
     message: '' , //may be null
     code: 'SUCCESS'
-}
+}</pre>
 
 - Post Transaction
-curl --request GET {host}/transactions -H "Authorization: Bearer: thetoken}" 
--d '{"uuid":"uuid-uuid-uuid","customerEmail":"test@test.test","customerPhone":"+35988888888", "amount":"0.1", "status":"REFUNDED","referenceId":"other-transaction-id"}'
+<code>curl --request GET {host}/transactions -H "Authorization: Bearer: thetoken}" -d <pre>'{
+    "uuid":"uuid-uuid-uuid",
+    "customerEmail":"test@test.test",
+    "customerPhone":"+35988888888",
+    "amount":"0.1",
+    "status":"REFUNDED",
+    "referenceId":"other-transaction-id"
+  }'</pre></code>
 
 The front-end is ReactJS: 
 
