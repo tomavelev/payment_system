@@ -3,6 +3,8 @@ import './TransactionListComponent.css'
 import { Component } from "react";
 import { Button, Card, CardBody } from "react-bootstrap";
 import { TRANSACTIONS_PAGE_SIZE, host } from "..";
+import AddTransactionComponent from "./AddTransactionComponent";
+import uuid from 'react-uuid';
 
 class TransactionListComponent extends Component {
 
@@ -12,6 +14,7 @@ class TransactionListComponent extends Component {
       list: [],
       offset: 0,
       count: '',
+      transaction: null,
       loading: false
     };
 
@@ -55,7 +58,8 @@ class TransactionListComponent extends Component {
   }
 
   load() {
-    axios.get(host + '/user/transactions?offset=' + this.state.offset + "&limit=" + TRANSACTIONS_PAGE_SIZE,
+    this.handleClose()
+    axios.get(host + '/transactions?offset=' + this.state.offset + "&limit=" + TRANSACTIONS_PAGE_SIZE,
       { headers: { 'Authorization': 'Bearer ' + localStorage.getItem("token") } })
       .then((response) => {
         if (this._isMounted)
@@ -72,6 +76,23 @@ class TransactionListComponent extends Component {
         }
       });
   }
+
+  addTransaction() {
+    this.setState({
+      transaction: {
+        uuid: uuid(),
+        status: "APPROVED",
+        customerEmail: '',
+        amount: 0
+      }
+    })
+  }
+  handleClose() {
+    this.setState({
+      transaction: null
+    })
+  }
+
   render() {
     return (
       <div className="transactions">
@@ -80,8 +101,8 @@ class TransactionListComponent extends Component {
           <Card key={transaction.id} className="transaction">
             <CardBody>
               <div>id: {transaction.id}</div>
-              <div>createdAt: {transaction.createdAt}</div>
-              <div>updatedAt: {transaction.updatedAt}</div>
+              <div>createdAt: {new Date(transaction.createdAt).toUTCString()}</div>
+              <div>updatedAt: {new Date(transaction.updatedAt).toUTCString()}</div>
               <div>customerEmail: {transaction.customerEmail}</div>
               <div>customerPhone: {transaction.customerPhone}</div>
               <div>uuid: {transaction.uuid}</div>
@@ -119,7 +140,11 @@ class TransactionListComponent extends Component {
           ""
         )}
 
-        <div>{this.state.offset + 1} to {this.state.offset + this.state.list.length} Total Transactions {this.state.count}</div>
+        <div>{this.state.offset + (this.state.list.length > 0 ? 1 : 0)} to {this.state.offset + this.state.list.length} Total Transactions {this.state.count}</div>
+
+        <p>  <Button onClick={() => this.addTransaction()} disabled={this.state.loading}>Add Transaction</Button>
+        </p>
+        <AddTransactionComponent transaction={this.state.transaction} saveCallback={() => this.load()} cancelCallback={() => this.handleClose()} />
       </div>
     )
   }

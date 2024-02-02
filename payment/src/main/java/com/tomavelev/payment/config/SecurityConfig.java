@@ -29,8 +29,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(registry ->
                 registry
                         .requestMatchers("/public/**").permitAll()
-                        .requestMatchers("/user/**").hasAnyAuthority(User.ROLE_MERCHANT, User.ROLE_ADMIN)
-                        .requestMatchers("/admin/**").hasAuthority(User.ROLE_ADMIN).anyRequest().authenticated());
+                        .requestMatchers("/user/**", "/transactions").hasAnyAuthority(User.ROLE_MERCHANT, User.ROLE_ADMIN)
+                        .requestMatchers("/admin/**", "/transactions").hasAuthority(User.ROLE_ADMIN).anyRequest().authenticated());
         http.sessionManagement(httpSecuritySessionManagementConfigurer
                 -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 

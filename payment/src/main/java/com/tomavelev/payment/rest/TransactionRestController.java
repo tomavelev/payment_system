@@ -14,15 +14,14 @@ public class TransactionRestController {
     @Autowired
     private TransactionService transactionService;
 
-    @PostMapping("/user/acceptPayment")
+    @PostMapping("/transactions")
     public PaymentResponse acceptPayment(@RequestBody PaymentTransaction transaction) {
         return transactionService.save(transaction);
     }
 
-    @GetMapping(value = "/user/transactions")
+    @GetMapping(value = "/transactions")
     public RestResponse<PaymentTransaction> transactions(@RequestParam(value = "offset", defaultValue = "0") long offset,
                                                          @RequestParam(value = "limit", defaultValue = "10") int limit) {
         return transactionService.getTransactions(offset, limit);
     }
-
 }

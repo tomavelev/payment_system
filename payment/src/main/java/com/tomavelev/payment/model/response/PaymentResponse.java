@@ -1,5 +1,5 @@
 package com.tomavelev.payment.model.response;
 
-public record PaymentResponse(BusinessCode code) {
+public record PaymentResponse(BusinessCode code, String message) {
 }
 

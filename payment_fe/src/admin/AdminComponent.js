@@ -1,7 +1,8 @@
 import { Component } from "react";
-import { Container, Tab, Tabs } from "react-bootstrap";
+import {  Container, Tab, Tabs } from "react-bootstrap";
 import TransactionListComponent from "../mertchant/TransactionListComponent";
 import UserListComponent from "./UserListComponent";
+import LogoutButton from "../login/LogoutButton";
 
 class AdminComponent extends Component {
 
@@ -23,6 +24,8 @@ class AdminComponent extends Component {
                         <TransactionListComponent />
                     </Tab>
                 </Tabs>
+                <LogoutButton />
+
             </Container>
         )
     }

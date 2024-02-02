@@ -191,7 +191,7 @@ class UserListComponent extends Component {
             ""
           )}
         </p>
-        <p>{this.state.offset + 1} to {this.state.offset + this.state.list.length} Total Users {this.state.count}</p>
+        <p>{this.state.offset +  (this.state.list.length > 0 ? 1 : 0)} to {this.state.offset + this.state.list.length} Total Users {this.state.count}</p>
 
         <p>  <Button onClick={() => this.addUser(false)} disabled={this.state.loading}>
           Add Admin User

@@ -36,7 +36,7 @@ public class UserRestController {
     }
 
     @PutMapping("/admin/user")
-    public String update(@RequestBody User user) {
+    public RestResponse<User> update(@RequestBody User user) {
         return userService.update(user);
     }
 

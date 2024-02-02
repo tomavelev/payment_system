@@ -82,12 +82,12 @@ class LogInFormComponent extends Component {
                 <Form.Label>Email address</Form.Label>
                 {/* <input type="text" value={this.state.value} onChange={this.handleChange} /> */}
 
-                <Form.Control type="email" placeholder="name@example.com" value={this.state.email} onChange={this.handleEmail} />
+                <Form.Control disabled={this.state.loading} type="email" placeholder="name@example.com" value={this.state.email} onChange={this.handleEmail} />
               </Form.Group>
 
               <Form.Group className="mb-3" controlId="password" value={this.state.password} onChange={this.handlePassword} >
                 <Form.Label>Password</Form.Label>
-                <Form.Control type="Password" placeholder="12345678" />
+                <Form.Control type="Password" placeholder="12345678" disabled={this.state.loading}/>
               </Form.Group>
 
               {this.state.loading ? <div><ProgressBar animated={true} min={0} max={100} now={50} />&nbsp;</div> : ''}

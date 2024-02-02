@@ -109,19 +109,23 @@ public class UserService {
     }
 
     @Transactional
-    public String update(User user) {
+    public RestResponse<User> update(User user) {
 
         Set<ConstraintViolation<User>> violations = validator.validate(user);
         if (!violations.isEmpty()) {
             StringBuilder sb = new StringBuilder();
-            violations.forEach(userConstraintViolation -> sb.append(userConstraintViolation.getPropertyPath()).append(" value: '").append(userConstraintViolation.getInvalidValue()).append("' ").append(userConstraintViolation.getMessage()));
-            return sb.toString();
+            violations.forEach(userConstraintViolation -> {
+                sb.append(userConstraintViolation.getPropertyPath()).append(" value: '").append(userConstraintViolation.getInvalidValue()).append("' ").append(userConstraintViolation.getMessage()).append(", ");
+            });
+            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length()-1);
+            return new RestResponse<>(null, 0, sb.toString(), BusinessCode.ERROR);
         }
 
         User userByEmail = userRepository.findByEmail(user.getEmail());
         if (user.getId() == null) {
             if (userByEmail != null) {
-                return BusinessCode.EMAIL_EXISTS.name();
+                return new RestResponse<>(null, 0, null, BusinessCode.EMAIL_EXISTS);
             }
 
             user.setPassword(passwordEncoder.encode(user.getPassword()));
@@ -146,6 +150,6 @@ public class UserService {
                 userRepository.save(dbUser);
             }
         }
-        return BusinessCode.SUCCESS.name();
+        return new RestResponse<>(null, 0, null, BusinessCode.SUCCESS);
     }
 }

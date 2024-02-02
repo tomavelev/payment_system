@@ -2,13 +2,9 @@ package com.tomavelev.payment.model;
 
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToOne;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.Min;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
+import com.tomavelev.payment.util.ValidPhoneNumber;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -27,17 +23,20 @@ public class PaymentTransaction extends BaseEntity {
     @NotBlank
     @Column(name = "customer_email")
     private String customerEmail;
-
+    @ValidPhoneNumber(message = "Please enter a valid phone number")
     @Column(name = "customer_phone")
     private String customerPhone;
 
     @NotNull
     private String uuid;
 
-    @Column(name = "amount",  precision = 20, scale = 5)
-    @Min(value = 0)
+    @Column(name = "amount", precision = 20, scale = 5)
+    @DecimalMin(value = "0.0", inclusive = false)
+    @Digits(integer = 20, fraction = 5)
+    @NotNull
     private BigDecimal amount;
 
+    @Enumerated(EnumType.ORDINAL)
     private TransactionStatus status;
 
     @Column(name = "reference_id")
@@ -48,7 +47,6 @@ public class PaymentTransaction extends BaseEntity {
 //    @Nullable
 //    @JoinColumn(name = "reference_id", nullable = true)
 //    private PaymentTransaction paymentTransaction;
-
 
 
     @JsonIgnore
