@@ -12,6 +12,7 @@ import com.tomavelev.payment.model.Merchant;
 import com.tomavelev.payment.model.User;
 import com.tomavelev.payment.model.response.BusinessCode;
 import com.tomavelev.payment.model.response.RestResponse;
+import com.tomavelev.payment.repository.MerchantRepository;
 import com.tomavelev.payment.repository.UserRepository;
 import com.tomavelev.payment.util.UserCsvMappingStrategy;
 import jakarta.transaction.Transactional;
@@ -36,6 +37,8 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    @Autowired
+    private MerchantRepository merchantRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -81,10 +84,11 @@ public class UserService {
             Random random = new Random();
             User user;
             Merchant merchant;
-            for (int i = 0; i < 1000; i++) {
+            for (int i = 0; i < 100; i++) {
 
                 user = new User();
                 user.setEmail(i + "test@test.test");
+                System.out.println("Generating " + user.getEmail());
                 //should be random, but for demo purposes - let it be known
                 user.setPassword(passwordEncoder.encode("password" + i));
 
@@ -105,7 +109,10 @@ public class UserService {
     @Transactional
     public void delete(User user) {
         Optional<User> user1 = userRepository.findById(user.getId());
-        user1.ifPresent(value -> userRepository.delete(value));
+        user1.ifPresent(dbUser -> {
+
+            userRepository.delete(dbUser);
+        });
     }
 
     @Transactional
@@ -117,8 +124,8 @@ public class UserService {
             violations.forEach(userConstraintViolation -> {
                 sb.append(userConstraintViolation.getPropertyPath()).append(" value: '").append(userConstraintViolation.getInvalidValue()).append("' ").append(userConstraintViolation.getMessage()).append(", ");
             });
-            sb.deleteCharAt(sb.length()-1);
-            sb.deleteCharAt(sb.length()-1);
+            sb.deleteCharAt(sb.length() - 1);
+            sb.deleteCharAt(sb.length() - 1);
             return new RestResponse<>(null, 0, sb.toString(), BusinessCode.ERROR);
         }
 
@@ -151,5 +158,9 @@ public class UserService {
             }
         }
         return new RestResponse<>(null, 0, null, BusinessCode.SUCCESS);
+    }
+
+    public User findByEmail(String mail) {
+        return userRepository.findByEmail(mail);
     }
 }

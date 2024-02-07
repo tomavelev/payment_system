@@ -84,6 +84,7 @@ public class UserRepositoryTest {
     public void findByEmail() throws Exception {
         User user = new User();
         String email = "test123@test.test";
+        user.setPassword("123");//not important to be hashed at the moment
         user.setEmail(email);
 
         userRepository.save(user);

@@ -29,7 +29,7 @@ public class UserRestController {
             userService.importFromSCV(tempFile);
             //noinspection ResultOfMethodCallIgnored
             tempFile.delete();
-        } catch (Exception e){
+        } catch (Exception e) {
             //silent duplicates
             //this ignore potentially could be moved to the service
         }
@@ -45,7 +45,7 @@ public class UserRestController {
         userService.delete(user);
     }
 
-    @GetMapping(value = "/admin/users")
+    @GetMapping(value = "/admin/user")
     public RestResponse<User> users(@RequestParam(value = "offset", defaultValue = "0") long offset,
                                     @RequestParam(value = "limit", defaultValue = "10") int limit) {
         return userService.getUsers(offset, limit);

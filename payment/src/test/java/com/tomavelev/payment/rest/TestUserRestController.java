@@ -4,9 +4,12 @@ import com.tomavelev.payment.PaymentApplication;
 import com.tomavelev.payment.model.User;
 import com.tomavelev.payment.model.response.LoginResponse;
 import com.tomavelev.payment.model.response.RestResponse;
+import com.tomavelev.payment.repository.TransactionRepository;
 import com.tomavelev.payment.repository.UserRepository;
+import com.tomavelev.payment.service.JwtTokenProvider;
 import com.tomavelev.payment.service.UserService;
 import jakarta.transaction.Transactional;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,6 +23,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import static com.tomavelev.payment.rest.TestAuthController.initUserVariations;
@@ -39,18 +44,24 @@ public class TestUserRestController {
     private PasswordEncoder passwordEncoder;
 
     @Autowired
+    private JwtTokenProvider tokenProvider;
+    @Autowired
     private UserRepository userRepository;
-    private static boolean setUpIsDone = false;
+    @Autowired
+    private TransactionRepository transactionRepository;
 
     @Before
     @Transactional
-    public void init() throws Exception {
-        if (setUpIsDone) {
-            return;
-        }
-        // do the setup
-        setUpIsDone = true;
+    public void init() {
+        userRepository.deleteAll();
         initUserVariations(passwordEncoder, userRepository);
+    }
+
+    @After
+    @Transactional
+    public void destroy() {
+        transactionRepository.deleteAll();
+        userRepository.deleteAll();
     }
 
     @Autowired
@@ -59,7 +70,6 @@ public class TestUserRestController {
 
     @Test
     public void update() {
-        //TODO runs successfully standalone - fails then run as part of the full project test
         String filter = template.getRootUri() + "/public/login";
         //noinspection StringBufferReplaceableByString
         StringBuilder sb = new StringBuilder();
@@ -90,69 +100,19 @@ public class TestUserRestController {
     }
 
 
-//    @Test
-//    public void delete() {
-
-        //TODO this test works in standalone run, but fails as part of full project test. Needs to be investigated
-//        String filter = template.getRootUri() + "/public/login";
-//        //noinspection StringBufferReplaceableByString
-//        StringBuilder sb = new StringBuilder();
-//        sb.append("email=test@test.test");
-//        sb.append("&password=password");
-//        HttpHeaders headers = new HttpHeaders();
-//
-//        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-//        HttpEntity<String> requestEntity = new HttpEntity<>(sb.toString(), headers);
-//
-//        ResponseEntity<LoginResponse> result = template.exchange(filter, HttpMethod.POST, requestEntity, LoginResponse.class);
-//
-//        assertTrue(result.hasBody());
-//        assertNotNull(Objects.requireNonNull(result.getBody()).token());
-//
-//
-//        User user = userRepository.findByEmail("testma@test.test");
-//        user.setPassword(passwordEncoder.encode("123123123"));
-//        headers.setBearerAuth(result.getBody().token());
-//        HttpEntity<User> requestEntityUser = new HttpEntity<>(user, headers);
-//
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//        ResponseEntity<Void> response = template.exchange(template.getRootUri() + "/admin/user",
-//                HttpMethod.DELETE, requestEntityUser, Void.class);
-//        assertSame(response.getStatusCode(), HttpStatus.OK);
-//
-//        user = userRepository.findByEmail("testma@test.test");
-//        assertNull(user);
-//
-//        //TODO validate users with referenced transactions
-//    }
-
 
     @Test
     public void users() {
 
+        String token = tokenProvider.generateToken("test@test.test", new ArrayList<>(List.of(User.ROLE_ADMIN)));
 
-        String filter = template.getRootUri() + "/public/login";
-        //noinspection StringBufferReplaceableByString
-        StringBuilder sb = new StringBuilder();
-        sb.append("email=test@test.test");
-        sb.append("&password=password");
         HttpHeaders headers = new HttpHeaders();
-
-        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<String> requestEntity = new HttpEntity<>(sb.toString(), headers);
-
-        ResponseEntity<LoginResponse> result = template.exchange(filter, HttpMethod.POST, requestEntity, LoginResponse.class);
-
-        assertTrue(result.hasBody());
-        assertNotNull(Objects.requireNonNull(result.getBody()).token());
-
-
-        headers.setBearerAuth(result.getBody().token());
+        headers.setBearerAuth(token);
         headers.setContentType(MediaType.APPLICATION_JSON);
         HttpEntity<Void> requestEntityUser = new HttpEntity<>(null, headers);
 
         ResponseEntity<RestResponse<User>> response = template.exchange(template.getRootUri()
-                                                                        + "/admin/users",
+                                                                        + "/admin/user",
                 HttpMethod.GET, requestEntityUser, new ParameterizedTypeReference<>() {
                 });
         assertSame(response.getStatusCode(), HttpStatus.OK);
@@ -161,7 +121,22 @@ public class TestUserRestController {
         assertTrue(response.hasBody());
         assertFalse(Objects.requireNonNull(response.getBody()).list().isEmpty());
 
-        //TODO test page 2
-    }
+        String password = passwordEncoder.encode("password");
+        List<User> users = new ArrayList<>();
+        for (int i = 0; i < 11; i++) {
+            User user = new User();
+            user.setEmail("test@test.test" + i);
+            user.setPassword(password);
 
+            users.add(user);
+        }
+        userRepository.saveAllAndFlush(users);
+
+        response = template.exchange(template.getRootUri()
+                                     + "/admin/user?offset=10",
+                HttpMethod.GET, requestEntityUser, new ParameterizedTypeReference<>() {
+                });
+        assertSame(response.getStatusCode(), HttpStatus.OK);
+        assertFalse(Objects.requireNonNull(response.getBody()).list().isEmpty());
+    }
 }

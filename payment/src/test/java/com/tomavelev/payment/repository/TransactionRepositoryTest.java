@@ -2,7 +2,7 @@ package com.tomavelev.payment.repository;
 
 import com.tomavelev.payment.PaymentApplication;
 import com.tomavelev.payment.model.PaymentTransaction;
-import com.tomavelev.payment.util.Check;
+import com.tomavelev.payment.model.TransactionStatus;
 import jakarta.transaction.Transactional;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -74,27 +74,6 @@ public class TransactionRepositoryTest {
         assertFalse(merchant1.isPresent());
     }
 
-//    @Test //TODO test deleteAllByCreatedAtLessThan
-//    @Transactional
-//    public void deleteAllByCreatedAtLessThan() throws Exception {
-//        PaymentTransaction transaction = newPaymentTransaction();
-//        transaction.setCreatedAt(new Date());
-//        transaction = transactionRepository.save(transaction);
-//
-//        transaction = newPaymentTransaction();
-//        transaction = transactionRepository.save(transaction);
-//        transaction.setCreatedAt(new Date(System.currentTimeMillis() - (Check.HOUR + 1)));
-//        transaction = transactionRepository.save(transaction);
-//
-//        List<PaymentTransaction> result = transactionRepository.findAll();
-//        assertEquals(2, result.size());
-//
-//        transactionRepository.deleteAllByCreatedAtLessThan(new Date(System.currentTimeMillis() - Check.HOUR));
-//        result = transactionRepository.findAll();
-//        assertEquals(1, result.size());
-//
-//    }
-
     @Test
     @Transactional
     public void loadById() throws Exception {
@@ -107,8 +86,11 @@ public class TransactionRepositoryTest {
 
     private PaymentTransaction newPaymentTransaction() {
         PaymentTransaction transaction = new PaymentTransaction();
+        transaction.setAmount(BigDecimal.ONE);
         transaction.setCustomerEmail("test@test.test");
-        transaction.setUuid(UUID.randomUUID().toString());
+        transaction.setCustomerPhone("+359882626454");
+        transaction.setStatus(TransactionStatus.APPROVED);
+
         return transaction;
     }
 }

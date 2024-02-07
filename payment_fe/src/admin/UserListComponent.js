@@ -103,7 +103,7 @@ class UserListComponent extends Component {
 
   load() {
     this.setState({ loading: true })
-    axios.get(host + '/admin/users?offset=' + this.state.offset + "&limit=" + TRANSACTIONS_PAGE_SIZE,
+    axios.get(host + '/admin/user?offset=' + this.state.offset + "&limit=" + TRANSACTIONS_PAGE_SIZE,
       {
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem("token")

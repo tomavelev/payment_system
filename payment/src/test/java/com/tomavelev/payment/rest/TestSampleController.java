@@ -54,12 +54,10 @@ public class TestSampleController {
     public void publicHello() {
 
         String filter = template.getRootUri() + "/public/hello";
-        //noinspection StringBufferReplaceableByString
-        StringBuilder sb = new StringBuilder();
         HttpHeaders headers = new HttpHeaders();
 
         headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
-        HttpEntity<String> requestEntity = new HttpEntity<>(sb.toString(), headers);
+        HttpEntity<String> requestEntity = new HttpEntity<>("", headers);
 
         ResponseEntity<String> result = template.exchange(filter, HttpMethod.GET, requestEntity, String.class);
 
@@ -71,7 +69,6 @@ public class TestSampleController {
     public void userHello() {
 
         String filter = template.getRootUri() + "/public/login";
-        //noinspection StringBufferReplaceableByString
         StringBuilder sb = new StringBuilder();
         sb.append("email=testm@test.test");
         sb.append("&password=password");
@@ -86,7 +83,6 @@ public class TestSampleController {
         Assert.assertNotNull(Objects.requireNonNull(result.getBody()).token());
 
         filter = template.getRootUri() + "/user/hello";
-        //noinspection StringBufferReplaceableByString
         sb = new StringBuilder();
         headers = new HttpHeaders();
 
@@ -104,7 +100,6 @@ public class TestSampleController {
     @Test
     public void adminHello() {
         String filter = template.getRootUri() + "/public/login";
-        //noinspection StringBufferReplaceableByString
         StringBuilder sb = new StringBuilder();
         sb.append("email=test@test.test");
         sb.append("&password=password");
@@ -119,7 +114,6 @@ public class TestSampleController {
         Assert.assertNotNull(Objects.requireNonNull(result.getBody()).token());
 
         filter = template.getRootUri() + "/admin/hello";
-        //noinspection StringBufferReplaceableByString
         sb = new StringBuilder();
         headers = new HttpHeaders();
 
@@ -129,7 +123,8 @@ public class TestSampleController {
 
         ResponseEntity<String> result1 = template.exchange(filter, HttpMethod.GET, requestEntity, String.class);
 
-        Assert.assertEquals(true, result1.hasBody());
+        Assert.assertTrue(result1.hasBody());
         String userString = "Hello from admin endpoint!";
+        Assert.assertEquals(userString, result1.getBody());
     }
 }

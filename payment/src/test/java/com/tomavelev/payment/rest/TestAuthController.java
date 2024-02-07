@@ -7,6 +7,7 @@ import com.tomavelev.payment.model.response.BusinessCode;
 import com.tomavelev.payment.model.response.LoginResponse;
 import com.tomavelev.payment.repository.UserRepository;
 import jakarta.transaction.Transactional;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -39,29 +40,29 @@ public class TestAuthController {
     @Autowired
     private UserRepository userRepository;
 
-    private static boolean setUpIsDone = false;
-
     @Before
     @Transactional
     public void init() throws Exception {
-        if (setUpIsDone) {
-            return;
-        }
-        // do the setup
-        setUpIsDone = true;
+        userRepository.deleteAll();
         initUserVariations(passwordEncoder, userRepository);
     }
 
+    @After
+    @Transactional
+    public void destroy() {
+        userRepository.deleteAll();
+    }
 
     public static void initUserVariations(PasswordEncoder passwordEncoder, UserRepository userRepository) {
+        String password = passwordEncoder.encode("password");
         User user = new User();
         user.setEmail("test@test.test");
-        user.setPassword(passwordEncoder.encode("password"));
-        userRepository.save(user);
+        user.setPassword(password);
+        userRepository.saveAndFlush(user);
 
         user = new User();
         user.setEmail("testm@test.test");
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(password);
         Merchant merchant = new Merchant();
         merchant.setDescription("description");
         merchant.setName("merchant ");
@@ -73,7 +74,19 @@ public class TestAuthController {
 
         user = new User();
         user.setEmail("testma@test.test");
-        user.setPassword(passwordEncoder.encode("password"));
+        user.setPassword(password);
+        merchant = new Merchant();
+        merchant.setDescription("description");
+        merchant.setName("merchant ");
+        merchant.setTotalTransactionSum(BigDecimal.ONE);
+        merchant.setActive(Boolean.TRUE);
+        user.setMerchant(merchant);
+
+        userRepository.save(user);
+
+        user = new User();
+        user.setEmail("testma2@test.test");
+        user.setPassword(password);
         merchant = new Merchant();
         merchant.setDescription("description");
         merchant.setName("merchant ");
@@ -105,7 +118,6 @@ public class TestAuthController {
 
     @Test
     public void testWrongPasswordAuthenticateUser() {
-        //TODO runs successfully standalone - fails then run as part of the full project test
         String filter = template.getRootUri() + "/public/login";
         //noinspection StringBufferReplaceableByString
         StringBuilder sb = new StringBuilder();

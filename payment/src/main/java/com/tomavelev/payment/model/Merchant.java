@@ -1,10 +1,7 @@
 package com.tomavelev.payment.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -19,7 +16,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper = true)
+@EqualsAndHashCode(callSuper = true, exclude = "user")
 @Entity(name = "merchant")
 public class Merchant extends BaseEntity {
 
@@ -37,8 +34,15 @@ public class Merchant extends BaseEntity {
     private BigDecimal totalTransactionSum;
 
     @JsonIgnore
-    @OneToMany(mappedBy = "merchant")
+    @OneToMany(mappedBy = "merchant", cascade = CascadeType.DETACH)
     private List<PaymentTransaction> transactions;
+
+    @PreRemove
+    public void checkForTransactions(){
+        if(transactions != null && !transactions.isEmpty()) {
+            throw new RuntimeException("Cannot delete Merchant with Transactions");
+        }
+    }
 
     @JsonIgnore
     @OneToOne(mappedBy = "merchant")

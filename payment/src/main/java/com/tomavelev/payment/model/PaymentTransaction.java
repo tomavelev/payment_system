@@ -28,6 +28,7 @@ public class PaymentTransaction extends BaseEntity {
     private String customerPhone;
 
     @NotNull
+    @NotBlank
     private String uuid;
 
     @Column(name = "amount", precision = 20, scale = 5)

@@ -3,9 +3,10 @@ package com.tomavelev.payment.model.response;
 public enum BusinessCode {
     SUCCESS,
     PROFILE_NOT_FOUND,
+    CUSTOMER_NOT_FOUND,
     WRONG_PASSWORD,
     ERROR,
     MERCHANT_NOT_ACTIVE,
 
-    EMAIL_EXISTS,
+    EMAIL_EXISTS, NOT_ENOUGH_CUSTOMER_FUNDS, REFERENCE_TRANSACTION_NOT_FOUND,
 }

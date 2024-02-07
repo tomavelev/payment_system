@@ -5,6 +5,9 @@ import com.tomavelev.payment.model.response.PaymentResponse;
 import com.tomavelev.payment.model.response.RestResponse;
 import com.tomavelev.payment.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -16,7 +19,10 @@ public class TransactionRestController {
 
     @PostMapping("/transactions")
     public PaymentResponse acceptPayment(@RequestBody PaymentTransaction transaction) {
-        return transactionService.save(transaction);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        User user = (User) authentication.getPrincipal();
+
+        return transactionService.save(transaction, user.getUsername());
     }
 
     @GetMapping(value = "/transactions")
